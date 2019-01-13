@@ -42,6 +42,23 @@ for _file in train_files:
 np.save("diseased_images.npy", dataset_diseased_hand)
 print("All images to array!")
 """
-DiseasedHand = np.load('diseased_images.npy')
-print(DiseasedHand.shape)
-print(DiseasedHand[0])
+#Train:915 CV:233 test:16
+DiseasedHand = np.load('EczemaHandDataset.npy')
+m = DiseasedHand.shape[0]
+
+permutation = list(np.random.permutation(m))
+X = DiseasedHand[permutation,:,:,:]
+
+Diseased_X_train = X[0:915,:,:,:] #input of training set m*n
+Diseased_Y_train = np.ones((915))
+
+Diseased_X_dev = X[915:1148,:,:,:] #
+diseased_Y_dev = np.ones((233)) #
+diseased_X_test = X[1148:,:,:,:]
+diseased_Y_test = np.ones((16))
+
+print("X_train shape:" + str(Diseased_X_train.shape))
+print("X_dev shape: " + str(Diseased_X_dev.shape))
+print("Y_train shape:" + str(Diseased_Y_train.shape))
+print("Y_dev shape" + str(diseased_Y_dev.shape))
+print("X_test shape:" + str(diseased_X_test.shape))
