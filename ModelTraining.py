@@ -203,7 +203,9 @@ model.fit(X_train, Y_train, epochs = 2, batch_size = 32)
 
 #evaluate
 preds = model.evaluate(X_test, Y_test)
+
 print ("Loss = " + str(preds[0]))
 print ("Test Accuracy = " + str(preds[1]))
+model.save('Res50.h5')
 #summary
 model.summary()
