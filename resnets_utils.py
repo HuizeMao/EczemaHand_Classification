@@ -5,13 +5,13 @@ import h5py
 import math
 
 def load_dataset():
-    X_train_orig = np.load('dataset/X_train.npy')
+    X_train = np.load('dataset/X_train.npy')
     Y_train = np.load('dataset/Y_train.npy')
-    X_CV_orig = np.load('dataset/X_CV.npy')
-    Y_CV = np.load('dataset/Y_CV.npy')
-    X_test_orig = np.load('dataset/X_test.npy')
+    X_CV = np.load('dataset/X_dev.npy')
+    Y_CV = np.load('dataset/Y_dev.npy')
+    X_test = np.load('dataset/X_test.npy')
     Y_test = np.load('dataset/Y_test.npy')
-    return X_train_orig, Y_train, X_CV_orig, Y_CV, X_test_orig,Y_test
+    return X_train, Y_train, X_CV, Y_CV, X_test,Y_test
 
 def random_mini_batches(X, Y, mini_batch_size = 64, seed = 0):
     """
