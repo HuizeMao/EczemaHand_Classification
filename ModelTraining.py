@@ -1,4 +1,4 @@
-#import all files
+#import all necessary libraries
 import numpy as np
 from keras import layers
 from keras.layers import Input, Add, Dense, Activation, ZeroPadding2D, BatchNormalization, Flatten, Conv2D, AveragePooling2D, MaxPooling2D, GlobalMaxPooling2D
@@ -16,14 +16,19 @@ from keras.initializers import glorot_uniform
 import scipy.misc
 from matplotlib.pyplot import imshow
 import keras.backend as K
-
+from time import sleep
+import cv2
 #load dataset
 X_train_orig, Y_train, X_CV_orig, Y_CV, X_test_orig, Y_test = load_dataset()
-
 # Normalize image vectors
 X_train = X_train_orig/255.
 X_CV = X_CV_orig/255.
 X_test = X_test_orig/255.
+#change the shape of Y outputs
+Y_train = np.array([Y_train]).T
+Y_CV = np.array([Y_CV]).T
+Y_test = np.array([Y_test]).T
+
 print ("number of training examples = " + str(X_train.shape[0]))
 print ("number of cross validation examples = " + str(X_CV.shape[0]))
 print ("number of test examples = " + str(X_test.shape[0]))
@@ -34,7 +39,7 @@ print ("Y_train shape: " + str(Y_train.shape))
 print ("Y_CV shape: " + str(Y_CV.shape))
 print ("Y_test shape: " + str(Y_test.shape))
 
-
+input = input('pause')
 #implement identity function that is used as one residual block
 def identity_block(X, f, filters, stage, block):
     """
@@ -132,7 +137,7 @@ def convolutional_block(X, f, filters, stage, block, s = 2):
     return X
 
 #create resnet with 50 layers using the risidual blocks implemented above
-def ResNet50(input_shape = (64, 64, 3), classes = 6):
+def ResNet50(input_shape,classes):
     """
     Implementation of the popular ResNet50 the following architecture:
     CONV2D -> BATCHNORM -> RELU -> MAXPOOL -> CONVBLOCK -> IDBLOCK*2 -> CONVBLOCK -> IDBLOCK*3
@@ -187,25 +192,27 @@ def ResNet50(input_shape = (64, 64, 3), classes = 6):
 
     # output layer
     X = Flatten()(X)
-    X = Dense(2, activation='sigmoid', name='fc' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
-
+    X = Dense(classes, activation='sigmoid', name='fc' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
     # Create model
     model = Model(inputs = X_input, outputs = X, name='ResNet50')
 
     return model
 
 #create model
-model = ResNet50(input_shape = (64, 64, 3), classes = 6)
+model = ResNet50((128, 128, 3),1)
 #compile
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model.compile(loss='binary_crossentropy',
+            optimizer='Adam',
+            metrics=['accuracy'])
 #fit
-model.fit(X_train, Y_train, epochs = 2, batch_size = 32)
+model.fit(X_train, Y_train, epochs = 10, batch_size = 32,verbose = 1)
+#save model
+model.save('ResNet50.h5')
 
 #evaluate
-preds = model.evaluate(X_test, Y_test)
+preds = model.evaluate(X_CV, Y_CV)
 
 print ("Loss = " + str(preds[0]))
 print ("Test Accuracy = " + str(preds[1]))
-model.save('Res50.h5')
 #summary
 model.summary()
