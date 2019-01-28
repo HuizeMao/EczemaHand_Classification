@@ -17,15 +17,22 @@ Y_test = np.load('dataset/Y_test.npy')"""
 
 #Eczema hand Train:915 CV:233 test:16
 normalhand = np.load('dataset/normalhand.npy')
-m = ImageArray.shape[0]
+
+m = normalhand.shape[0]
 print('normal hand m: ' + str(m))
-print(ImageArray.shape)
+#resuffle the images
+permutation = list(np.random.permutation(m))
+normalhand = normalhand[permutation,:,:,:]
+print(normalhand.shape)
 
 #Normal Hand Train:1342, CV:447, test:447
 eczemahand = np.load('dataset/EczemaHandDataset.npy')
-m2 = SecondImageArray.shape[0]
+#reshuffle the images
+m2 = eczemahand.shape[0]
+permutation = list(np.random.permutation(m2))
+eczemahand = eczemahand[permutation,:,:,:]
 print('EczemaHand dataset shape: ' + str(m2))
-print(SecondImageArray.shape)
+print(eczemahand.shape)
 
 #function that splits datasets into three sets
 def split_into_three_sets_eczema(dataset,TrainSetNum,CVSetNum,TestSetNum,classes):
