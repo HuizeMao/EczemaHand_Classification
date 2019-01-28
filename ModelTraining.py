@@ -200,7 +200,9 @@ def ResNet50(input_shape,classes):
 
     # output layer
     X = Flatten()(X)
-    X = Dense(classes, activation='sigmoid', name='fc' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
+    X = Dense(800, activation='relu', name='fc0' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
+    X = Dense(150, activation='relu', name='fc1' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
+    X = Dense(classes, activation='sigmoid', name='fc2' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
     # Create model
     model = Model(inputs = X_input, outputs = X, name='ResNet50')
 
@@ -212,6 +214,7 @@ model = ResNet50((128, 128, 3),1)
 model.compile(loss='binary_crossentropy',
             optimizer='Adam',
             metrics=['accuracy'])
+
 #fit
 model.fit(X_train, Y_train, epochs = 10, batch_size = 32,verbose = 1)
 #save model
