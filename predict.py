@@ -13,7 +13,6 @@ img = np.expand_dims(img,axis=0)"""
 
 
 img = load_img('InputImage.png')
-img.thumbnail((128,128), Image.ANTIALIAS)
 img = img_to_array(img)
 img = img.reshape(1,128,128,3)
 #load model and predict
