@@ -15,6 +15,7 @@ from resnets_utils import *
 from keras.initializers import glorot_uniform
 import scipy.misc
 from matplotlib.pyplot import imshow
+from matplotlib import pyplot as plt
 import keras.backend as K
 from time import sleep
 import cv2
