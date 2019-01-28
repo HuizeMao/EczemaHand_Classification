@@ -31,13 +31,13 @@ print(SecondImageArray.shape)
 def split_into_three_sets_eczema(dataset,TrainSetNum,CVSetNum,TestSetNum,classes):
     X_train = dataset[0:TrainSetNum,:,:,:] #input of training set m*n
     Y_train = np.ones((TrainSetNum))
-    X_dev = dataset[TrainSetNum:TrainSetNum+CVSetNum,:,:,:] #
+    X_dev = dataset[TrainSetNum+1:TrainSetNum+CVSetNum,:,:,:] #
     Y_dev = np.ones((CVSetNum)) #
-    X_test = dataset[TrainSetNum+CVSetNum:,:,:,:]
+    X_test = dataset[TrainSetNum+CVSetNum+1:,:,:,:]
     Y_test = np.ones((TestSetNum))
     return(X_train,Y_train,X_dev,Y_dev,X_test,Y_test)
 
-X_train,Y_train,X_dev,Y_dev,X_test,Y_test = split_into_three_sets_normal(eczemahand,915,233,16,2)
+X_train,Y_train,X_dev,Y_dev,X_test,Y_test = split_into_three_sets_normal(eczemahand,915,200,40,2)
 
 def split_into_three_sets_normal(dataset,TrainSetNum,CVSetNum,TestSetNum,classes):
     X_train = dataset[0:TrainSetNum,:,:,:] #input of training set m*n
