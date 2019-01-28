@@ -20,10 +20,18 @@ from time import sleep
 import cv2
 #load dataset
 X_train_orig, Y_train, X_CV_orig, Y_CV, X_test_orig, Y_test = load_dataset()
+
+#select a training data image and show
+show_img = (X_train_orig[0]).astype(np.uint8)
+print(show_img)
+plt.imshow(show_img)
+plt.show()
+
 # Normalize image vectors
 X_train = X_train_orig/255.
 X_CV = X_CV_orig/255.
 X_test = X_test_orig/255.
+
 #change the shape of Y outputs
 Y_train = np.array([Y_train]).T
 Y_CV = np.array([Y_CV]).T
