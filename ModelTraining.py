@@ -34,9 +34,9 @@ X_CV = X_CV_orig/255.
 X_test = X_test_orig/255.
 
 #change the shape of Y outputs
-Y_train = np.array([Y_train]).T
-Y_CV = np.array([Y_CV]).T
-Y_test = np.array([Y_test]).T
+Y_train = np.expand_dims(Y_train,axis=1)
+Y_CV = np.expand_dims(Y_CV,axis=1)
+Y_test = np.expand_dims(Y_test,axis=1)
 
 print ("number of training examples = " + str(X_train.shape[0]))
 print ("number of cross validation examples = " + str(X_CV.shape[0]))
@@ -202,8 +202,8 @@ def ResNet50(input_shape,classes):
     # output layer
     X = Flatten()(X)
     X = Dense(800, activation='relu', name='fc0' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
-    X = Dense(150, activation='relu', name='fc1' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
-    X = Dense(classes, activation='sigmoid', name='fc2' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
+    X = Dense(150, activation='relu', name='fc01' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
+    X = Dense(classes, activation='sigmoid', name='fc02' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
     # Create model
     model = Model(inputs = X_input, outputs = X, name='ResNet50')
 
@@ -217,9 +217,9 @@ model.compile(loss='binary_crossentropy',
             metrics=['accuracy'])
 
 #fit
-model.fit(X_train, Y_train, epochs = 10, batch_size = 32,verbose = 1)
+model.fit(X_train, Y_train, epochs = 50, batch_size = 32,verbose = 1)
 #save model
-model.save('ResNet50.h5')
+model.save('ResNet50_2.h5')
 
 #evaluate
 preds = model.evaluate(X_CV, Y_CV)
