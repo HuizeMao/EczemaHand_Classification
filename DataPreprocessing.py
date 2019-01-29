@@ -38,24 +38,24 @@ print(eczemahand.shape)
 def split_into_three_sets_eczema(dataset,TrainSetNum,CVSetNum,TestSetNum,classes):
     X_train = dataset[0:TrainSetNum,:,:,:] #input of training set m*n
     Y_train = np.ones((TrainSetNum))
-    X_dev = dataset[TrainSetNum+1:TrainSetNum+CVSetNum,:,:,:] #
+    X_dev = dataset[TrainSetNum:TrainSetNum+CVSetNum,:,:,:] #
     Y_dev = np.ones((CVSetNum)) #
-    X_test = dataset[TrainSetNum+CVSetNum+1:,:,:,:]
+    X_test = dataset[TrainSetNum+CVSetNum:,:,:,:]
     Y_test = np.ones((TestSetNum))
     return(X_train,Y_train,X_dev,Y_dev,X_test,Y_test)
 
-X_train,Y_train,X_dev,Y_dev,X_test,Y_test = split_into_three_sets_normal(eczemahand,915,200,40,2)
+X_train,Y_train,X_dev,Y_dev,X_test,Y_test = split_into_three_sets_eczema(eczemahand,915,200,40,2)
 
 def split_into_three_sets_normal(dataset,TrainSetNum,CVSetNum,TestSetNum,classes):
     X_train = dataset[0:TrainSetNum,:,:,:] #input of training set m*n
     Y_train = np.zeros((TrainSetNum))
-    X_dev = dataset[TrainSetNum+1:TrainSetNum+CVSetNum,:,:,:] #
+    X_dev = dataset[TrainSetNum:TrainSetNum+CVSetNum,:,:,:] #
     Y_dev = np.zeros((CVSetNum)) #
-    X_test = dataset[TrainSetNum+CVSetNum+1:,:,:,:]
+    X_test = dataset[TrainSetNum+CVSetNum:,:,:,:]
     Y_test = np.zeros((TestSetNum))
     return(X_train,Y_train,X_dev,Y_dev,X_test,Y_test)
 
-X_train2,Y_train2,X_dev2,Y_dev2,X_test2,Y_test2 = split_into_three_sets_normal(normalhand,1342,447,447,2)
+X_train2,Y_train2,X_dev2,Y_dev2,X_test2,Y_test2 = split_into_three_sets_normal(normalhand,1400,300,300,2)
 
 X_train = np.append(X_train,X_train2,axis = 0)
 X_dev  = np.append(X_dev,X_dev2,axis = 0)
