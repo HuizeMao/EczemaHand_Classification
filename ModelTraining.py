@@ -2,7 +2,7 @@
 import numpy as np
 import keras
 from keras import layers
-from keras.layers import Input, Add, Dense, Activation, ZeroPadding2D, BatchNormalization, Flatten, Conv2D, AveragePooling2D, MaxPooling2D, GlobalMaxPooling2D
+from keras.layers import Input, Add, Dense, Activation, ZeroPadding2D, BatchNormalization, Flatten, Conv2D, AveragePooling2D, MaxPooling2D, GlobalMaxPooling2D, Dropout
 from keras.models import Model, load_model
 from keras.preprocessing import image
 from keras.utils import layer_utils
@@ -34,6 +34,8 @@ X_train = X_train_orig/255.
 X_CV = X_CV_orig/255.
 X_test = X_test_orig/255.
 
+m = X_train[0]
+print("Number of training examples: {}".format(m))
 #change the shape of Y outputs
 Y_train = np.expand_dims(Y_train,axis=1)
 Y_CV = np.expand_dims(Y_CV,axis=1)
@@ -125,30 +127,30 @@ def convolutional_block(X, f, filters, stage, block, s = 2):
 
     ##### MAIN PATH #####
     # First component of main path
-    X = Conv2D(F1, (1, 1), strides = (s,s), name = conv_name_base + '2a', kernel_initializer = glorot_uniform(seed=0))(X)
+    X = Conv2D(F1, (1, 1), strides = (s,s), name = conv_name_base + '2a')(X)
     X = BatchNormalization(axis = 3, name = bn_name_base + '2a')(X)
     X = Activation('relu')(X)
-    X = Dropout(0.2)(X)
+    X = Dropout(0.5)(X)
 
 
     # Second component of main path (≈3 lines)
-    X = Conv2D(F2, (f, f), strides = (1,1), padding = 'same', name = conv_name_base + '2b', kernel_initializer = glorot_uniform(seed=0))(X)
+    X = Conv2D(F2, (f, f), strides = (1,1), padding = 'same', name = conv_name_base + '2b')(X)
     X = BatchNormalization(axis = 3, name = bn_name_base + '2b')(X)
     X = Activation('relu')(X)
-    X = Dropout(0.2)(X)
+    X = Dropout(0.5)(X)
 
     # Third component of main path (≈2 lines)
-    X = Conv2D(F3, (1, 1), strides = (1,1), padding = 'valid', name = conv_name_base + '2c', kernel_initializer = glorot_uniform(seed=0))(X)
+    X = Conv2D(F3, (1, 1), strides = (1,1), padding = 'valid', name = conv_name_base + '2c')(X)
     X = BatchNormalization(axis = 3, name = bn_name_base + '2c')(X)
 
     ##### SHORTCUT PATH #### (≈2 lines)
-    X_shortcut = Conv2D(F3, (1, 1), strides = (s,s), name = conv_name_base + '1', kernel_initializer = glorot_uniform(seed=0))(X_shortcut)
+    X_shortcut = Conv2D(F3, (1, 1), strides = (s,s), name = conv_name_base + '1')(X_shortcut)
     X_shortcut = BatchNormalization(axis = 3, name = bn_name_base + '1')(X_shortcut)
 
     # Final step: Add shortcut value to main path, and pass it through a RELU activation (≈2 lines)
     X = Add()([X,X_shortcut])
     X = Activation('relu')(X)
-    X = Dropout(0.2)(X)
+    X = Dropout(0.5)(X)
 
     return X
 
@@ -174,7 +176,7 @@ def ResNet50(input_shape,classes):
     X = ZeroPadding2D((3, 3))(X_input)
 
     # Stage 1
-    X = Conv2D(64, (7, 7), strides = (2, 2), name = 'conv1', kernel_initializer = glorot_uniform(seed=0))(X)
+    X = Conv2D(64, (7, 7), strides = (2, 2), name = 'conv1')(X)
     X = BatchNormalization(axis = 3, name = 'bn_conv1')(X)
     X = Activation('relu')(X)
     X = MaxPooling2D((3, 3), strides=(2, 2))(X)
@@ -208,12 +210,13 @@ def ResNet50(input_shape,classes):
 
     # output layer
     X = Flatten()(X)
-    X = Dense(800, activation='relu', name='fc0' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
-    X = Dropout(0.2)(X)
-    X = Dense(150, activation='relu', name='fc1' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
-    X = Dropout(0.2)(X)
-    X = Dense(10, activation='sigmoid', name='fc2' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
-    X = Dense(classes, activation='sigmoid', name='fc3' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
+    X = Dense(800, activation='relu', name='fc0' + str(classes))(X)
+    X = Dropout(0.5)(X)
+    X = Dense(150, activation='relu', name='fc1' + str(classes))(X)
+    X = Dropout(0.5)(X)
+    X = Dense(10, activation='relu', name='fc2' + str(classes))(X)
+    X = Dropout(0.5)(X)
+    X = Dense(1, activation='sigmoid', name='fc3' + str(classes))(X)
     # Create model
     model = Model(inputs = X_input, outputs = X, name='ResNet50')
 
@@ -225,12 +228,12 @@ model = ResNet50((128,128,3),1)
 #compile
 model.compile(loss='binary_crossentropy',
             optimizer = keras.optimizers.SGD(lr=0.01, decay=0, momentum=0, nesterov=False),
-            metrics=['accuracy'])
+            metrics=['acc',binary_accuracy])
 
 #fit
-history = model.fit(X_train, Y_train, epochs = 1, batch_size = 32,verbose = 1)
+history = model.fit(X_train, Y_train, batch_size = m,epochs = 10,verbose = 1, validation_data = (X_CV,Y_CV),shuffle=True)
 #save model
-model.save('ResNet50_3.h5')
+model.save('ResNet50_4.h5')
 
 #evaluate
 preds = model.evaluate(X_CV, Y_CV)
@@ -243,16 +246,18 @@ model.summary()
 #model history
 # summarize history for accuracy
 plt.plot(history.history['acc'])
-plt.title('history accuracy')
+plt.plot(history.history['val_acc'])
+plt.title('model accuracy')
 plt.ylabel('accuracy')
 plt.xlabel('epoch')
-plt.legend(['train'], loc='upper left')
+plt.legend(['train', 'test'], loc='upper left')
 plt.show()
 
 # summarize history for loss
 plt.plot(history.history['loss'])
-plt.title('history loss')
+plt.plot(history.history['val_loss'])
+plt.title('model loss')
 plt.ylabel('loss')
 plt.xlabel('epoch')
-plt.legend(['train'], loc='upper left')
+plt.legend(['train', 'test'], loc='upper left')
 plt.show()
