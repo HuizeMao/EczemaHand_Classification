@@ -125,13 +125,13 @@ def ResNet50(input_shape,classes):
     X_input = Input(input_shape)
 
     # Zero-Padding
-    X = ZeroPadding2D((3, 3))(X_input)
+    X = ZeroPadding2D((7, 7))(X_input)
 
     # Stage 1
     X = Conv2D(64, (5, 5), strides = (2, 2), name = 'conv1', padding ='same')(X)
     X = BatchNormalization(axis = 3, name = 'bn_conv1')(X)
     X = Activation('relu')(X)
-    X = MaxPooling2D((2, 2), strides=(1,1))(X)
+    X = MaxPooling2D((3, 3), strides=(2,2))(X)
     # Stage 2
     X = Conv2D(128, (3, 3), strides = (2, 2), padding = 'same', name = 'conv2')(X)
     X = BatchNormalization(axis = 3, name = 'bn_conv2')(X)
