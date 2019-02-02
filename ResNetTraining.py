@@ -25,7 +25,7 @@ import cv2
 X_train_orig, Y_train, X_CV_orig, Y_CV, X_test_orig, Y_test = load_dataset()
 
 #select a training data image and show
-show_img = (X_train_orig[-3]).astype(np.uint8)
+show_img = (X_train_orig[358]).astype(np.uint8)
 print(show_img)
 plt.imshow(show_img)
 plt.show()
@@ -81,13 +81,11 @@ def identity_block(X, f, filters, stage, block):
     X = Conv2D(filters = F1, kernel_size = (1, 1), strides = (1,1), padding = 'valid', name = conv_name_base + '2a', kernel_initializer = glorot_uniform(seed=0))(X)
     X = BatchNormalization(axis = 3, name = bn_name_base + '2a')(X)
     X = Activation('relu')(X)
-    X = Dropout(0.1)(X)
 
     # Second component of main path (≈3 lines)
     X = Conv2D(filters = F2, kernel_size = (f,f), strides = (1,1), padding = 'same', name = conv_name_base + '2b', kernel_initializer = glorot_uniform(seed=0))(X)
     X = BatchNormalization(axis = 3, name = bn_name_base + '2b')(X)
     X = Activation('relu')(X)
-    X = Dropout(0.1)(X)
 
     # Third component of main path (≈2 lines)
     X = Conv2D(filters = F3, kernel_size = (1, 1), strides = (1,1), padding = 'valid', name = conv_name_base + '2c', kernel_initializer = glorot_uniform(seed=0))(X)
@@ -96,7 +94,6 @@ def identity_block(X, f, filters, stage, block):
     # Final step: Add shortcut value to main path, and pass it through a RELU activation (≈2 lines)
     X = Add()([X,X_shortcut])
     X = Activation('relu')(X)
-    X = Dropout(0.1)(X)
     return X
 
 #implement convolution block which is also a risidual block but this one change the size of input data
@@ -130,14 +127,12 @@ def convolutional_block(X, f, filters, stage, block, s = 2):
     X = Conv2D(F1, (1, 1), strides = (s,s), name = conv_name_base + '2a')(X)
     X = BatchNormalization(axis = 3, name = bn_name_base + '2a')(X)
     X = Activation('relu')(X)
-    X = Dropout(0.1)(X)
 
 
     # Second component of main path (≈3 lines)
     X = Conv2D(F2, (f, f), strides = (1,1), padding = 'same', name = conv_name_base + '2b')(X)
     X = BatchNormalization(axis = 3, name = bn_name_base + '2b')(X)
     X = Activation('relu')(X)
-    X = Dropout(0.1)(X)
 
     # Third component of main path (≈2 lines)
     X = Conv2D(F3, (1, 1), strides = (1,1), padding = 'valid', name = conv_name_base + '2c')(X)
@@ -231,7 +226,7 @@ def ResNet50(input_shape,classes):
     return model
 
 #create model
-model = ResNet50((128,128,3),1):
+model = load_model("ResNet50_7.h5")
 #model = load_model('ResNet50_6.h5')
 #compile
 model.compile(loss='binary_crossentropy',
@@ -239,9 +234,9 @@ model.compile(loss='binary_crossentropy',
             metrics=['acc'])
 
 #fit
-history = model.fit(X_train, Y_train, batch_size = 2315,epochs = 50,verbose = 1, validation_data = (X_CV,Y_CV),shuffle=True)
+history = model.fit(X_train, Y_train, batch_size = 2315,epochs = 100,verbose = 1, validation_data = (X_CV,Y_CV),shuffle=True)
 #save model
-model.save('ResNet50_7.h5')
+model.save('ResNet50_8.h5')
 
 #evaluate
 preds = model.evaluate(X_CV, Y_CV)
