@@ -9,7 +9,7 @@ from keras.layers.normalization import BatchNormalization
 from keras.layers.merge import concatenate
 from keras import regularizers
 from keras import initializers
-from keras.models import Model
+from keras.models import Model,load_model
 # Backend
 from keras.callbacks import ModelCheckpoint,EarlyStopping
 from keras import backend as K
@@ -259,8 +259,8 @@ def create_model(num_classes=1, dropout_prob=0.2, weights=None, include_top=True
     return inception_v4(num_classes, dropout_prob, weights, include_top)
 
 
-model = create_model()
-#model = load_model('InceptionModel.h5')
+#model = create_model()
+model = load_model('Inception_1.h5')
 #compile
 model.compile(loss='binary_crossentropy',
             optimizer = keras.optimizers.SGD(lr=0.03, decay=0, momentum=0, nesterov=False),
@@ -269,10 +269,10 @@ model.compile(loss='binary_crossentropy',
 #define early stopping
 Val_loss_increased = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=8)
 Train_NotImproved = EarlyStopping(monitor='acc', mode = 'max', verbose=1, baseline = 0.3, patience = 5)
-mc = ModelCheckpoint('Inception_1.h5', monitor='val_acc', mode='max', verbose=1, save_best_only=True)
+mc = ModelCheckpoint('Inception_2.h5', monitor='val_acc', mode='max', verbose=1, save_best_only=True)
 
 #fit
-history = model.fit(X_train, Y_train, batch_size = 2315,epochs = 50,verbose = 1, validation_data = (X_CV,Y_CV),shuffle=True, callbacks=[Val_loss_increased, Train_NotImproved,mc])
+history = model.fit(X_train, Y_train, batch_size = 2315,epochs = 30,verbose = 1, validation_data = (X_CV,Y_CV),shuffle=True, callbacks=[Val_loss_increased, Train_NotImproved,mc])
 
 ###save model
 ##model.save('Inception_1.h5')
